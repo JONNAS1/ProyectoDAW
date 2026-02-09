@@ -5,8 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { FichaItemComponent } from '../ficha-item/ficha-item';
-import { FICHAS } from '../data/fichas.data';
-import { Ficha } from '../models/ficha.model';
+import { FICHAS } from '../../data/fichas.data';
+import { Ficha } from '../../models/ficha.model';
 
 @Component({
   selector: 'app-ficha-list',

@@ -2,8 +2,8 @@
 import { Routes } from '@angular/router';
 
 import { HomeComponent } from './pages/home/home';
-import { FichaListComponent } from './ficha-list/ficha-list';
-import { FichaComponent } from './ficha/ficha';
+import { FichaListComponent } from './pages/ficha-list/ficha-list';
+import { FichaComponent } from './pages/ficha/ficha';
 import { ProgrammingComponent } from './pages/programming/programming';
 import { DatabasesComponent } from './pages/databases/databases';
 import { TerminalComponent } from './pages/terminal/terminal';

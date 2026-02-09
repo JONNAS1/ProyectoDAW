@@ -1,7 +1,7 @@
 // src/app/ficha-item/ficha-item.ts
 import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Ficha } from '../models/ficha.model';
+import { Ficha } from '../../models/ficha.model';
 
 @Component({
   selector: 'app-ficha-item',

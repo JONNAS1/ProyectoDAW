@@ -2,10 +2,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { FICHAS } from '../data/fichas.data';
-import { Ficha } from '../models/ficha.model';
-import { AuthService } from '../services/auth.service';
-import { FavoritesService } from '../services/favorites.service';
+import { FICHAS } from '../../data/fichas.data';
+import { Ficha } from '../../models/ficha.model';
+import { AuthService } from '../../services/auth.service';
+import { FavoritesService } from '../../services/favorites.service';
 
 @Component({
   selector: 'app-ficha',
