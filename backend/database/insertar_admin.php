@@ -7,8 +7,8 @@
 
 require_once __DIR__ . '/../config/database.php';
 
-$nombre = "Administrador";
-$email = "admin@proyectodaw.com";
+$username = "admin";
+$email = "admin@chuletarium.com";
 $password = "admin123"; // Cambiar en produccion
 
 try {
@@ -24,17 +24,17 @@ try {
         exit;
     }
 
-    // Hashear password con password_hash
+    // Hashear password con password_hash (bcrypt)
     $password_hash = password_hash($password, PASSWORD_DEFAULT);
 
     // Insertar admin (consulta parametrizada)
     $stmt = $conn->prepare(
-        "INSERT INTO usuarios (nombre, email, password, rol, idioma)
-         VALUES (:nombre, :email, :password, :rol, :idioma)"
+        "INSERT INTO usuarios (username, email, password, rol, idioma)
+         VALUES (:username, :email, :password, :rol, :idioma)"
     );
 
     $stmt->execute([
-        ':nombre'   => $nombre,
+        ':username' => $username,
         ':email'    => $email,
         ':password' => $password_hash,
         ':rol'      => 1, // Admin

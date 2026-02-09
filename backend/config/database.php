@@ -5,7 +5,7 @@
 
 class Database {
     private string $host = "localhost";
-    private string $db_name = "proyectodaw";
+    private string $db_name = "chuletarium";
     private string $username = "root";
     private string $password = "";
     private string $charset = "utf8mb4";

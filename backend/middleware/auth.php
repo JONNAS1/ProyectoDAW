@@ -30,7 +30,7 @@ function verificarAuth(): array {
 
         // Verificar token y que no haya expirado (consulta parametrizada)
         $stmt = $conn->prepare(
-            "SELECT u.id, u.nombre, u.email, u.rol, u.idioma, u.activo
+            "SELECT u.id, u.username, u.email, u.rol, u.idioma, u.activo
              FROM sesiones s
              INNER JOIN usuarios u ON s.usuario_id = u.id
              WHERE s.token = :token

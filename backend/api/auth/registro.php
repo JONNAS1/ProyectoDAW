@@ -2,7 +2,7 @@
 // ============================================
 // API: Registro de usuario
 // POST /api/auth/registro.php
-// Body: { "nombre": "", "email": "", "password": "", "idioma": "es" }
+// Body: { "username": "", "email": "", "password": "", "idioma": "es" }
 // ============================================
 
 require_once __DIR__ . '/../../config/cors.php';
@@ -19,16 +19,16 @@ $datos = json_decode(file_get_contents("php://input"), true);
 
 // Validar campos obligatorios
 if (
-    empty($datos['nombre']) ||
+    empty($datos['username']) ||
     empty($datos['email']) ||
     empty($datos['password'])
 ) {
     http_response_code(400);
-    echo json_encode(["error" => "Nombre, email y password son obligatorios"]);
+    echo json_encode(["error" => "Username, email y password son obligatorios"]);
     exit;
 }
 
-$nombre = trim($datos['nombre']);
+$username = trim($datos['username']);
 $email = trim($datos['email']);
 $password = $datos['password'];
 $idioma = isset($datos['idioma']) ? trim($datos['idioma']) : 'es';
@@ -66,12 +66,12 @@ try {
 
     // Insertar usuario (consulta parametrizada)
     $stmt = $conn->prepare(
-        "INSERT INTO usuarios (nombre, email, password, rol, idioma)
-         VALUES (:nombre, :email, :password, :rol, :idioma)"
+        "INSERT INTO usuarios (username, email, password, rol, idioma)
+         VALUES (:username, :email, :password, :rol, :idioma)"
     );
 
     $stmt->execute([
-        ':nombre'   => $nombre,
+        ':username' => $username,
         ':email'    => $email,
         ':password' => $password_hash,
         ':rol'      => 0, // Siempre usuario normal al registrarse
@@ -84,11 +84,11 @@ try {
     echo json_encode([
         "mensaje" => "Usuario registrado correctamente",
         "usuario" => [
-            "id"     => (int) $usuario_id,
-            "nombre" => $nombre,
-            "email"  => $email,
-            "rol"    => 0,
-            "idioma" => $idioma,
+            "id"       => (int) $usuario_id,
+            "username" => $username,
+            "email"    => $email,
+            "rol"      => 0,
+            "idioma"   => $idioma,
         ]
     ]);
 

@@ -32,7 +32,7 @@ try {
 
     // Buscar usuario por email (consulta parametrizada)
     $stmt = $conn->prepare(
-        "SELECT id, nombre, email, password, rol, idioma, activo
+        "SELECT id, username, email, password, rol, idioma, activo
          FROM usuarios
          WHERE email = :email"
     );
@@ -89,11 +89,11 @@ try {
         "mensaje" => "Login correcto",
         "token"   => $token,
         "usuario" => [
-            "id"     => (int) $usuario['id'],
-            "nombre" => $usuario['nombre'],
-            "email"  => $usuario['email'],
-            "rol"    => (int) $usuario['rol'],
-            "idioma" => $usuario['idioma'],
+            "id"       => (int) $usuario['id'],
+            "username" => $usuario['username'],
+            "email"    => $usuario['email'],
+            "rol"      => (int) $usuario['rol'],
+            "idioma"   => $usuario['idioma'],
         ]
     ]);
 
