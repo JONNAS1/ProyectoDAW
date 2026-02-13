@@ -57,6 +57,7 @@ try {
         echo json_encode([
             "mensaje"  => "Favorito eliminado",
             "favorito" => false,
+            "accion"   => "eliminado",
         ]);
     } else {
         // No es favorito -> anadir (consulta parametrizada)
@@ -72,6 +73,7 @@ try {
         echo json_encode([
             "mensaje"  => "Favorito anadido",
             "favorito" => true,
+            "accion"   => "agregado",
         ]);
     }
 

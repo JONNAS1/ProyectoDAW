@@ -286,7 +286,6 @@ ALTER TABLE `bloques_notas`
   ADD CONSTRAINT `fk_notas_bloque` FOREIGN KEY (`bloque_id`) REFERENCES `bloques` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `favoritos`
-  ADD CONSTRAINT `fk_favoritos_ficha` FOREIGN KEY (`ficha_id`) REFERENCES `fichas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_favoritos_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE `fichas`

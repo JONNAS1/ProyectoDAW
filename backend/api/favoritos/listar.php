@@ -21,15 +21,13 @@ try {
     $db = new Database();
     $conn = $db->getConnection();
 
-    // Obtener fichas favoritas del usuario (consulta parametrizada)
+    // Obtener IDs de fichas favoritas del usuario (consulta parametrizada)
+    // No hace JOIN con fichas porque el frontend Angular usa datos locales (FICHAS array)
     $stmt = $conn->prepare(
-        "SELECT f.id, f.titulo, f.descripcion, f.nivel, f.fecha_actualizacion,
-                c.nombre AS categoria
-         FROM favoritos fav
-         INNER JOIN fichas f ON fav.ficha_id = f.id
-         INNER JOIN categorias c ON f.categoria_id = c.id
-         WHERE fav.usuario_id = :usuario_id
-         ORDER BY fav.fecha_creacion DESC"
+        "SELECT ficha_id, fecha_creacion
+         FROM favoritos
+         WHERE usuario_id = :usuario_id
+         ORDER BY fecha_creacion DESC"
     );
     $stmt->execute([':usuario_id' => $usuario_actual['id']]);
     $favoritos = $stmt->fetchAll();
