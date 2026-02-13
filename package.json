@@ -1,6 +1,13 @@
 {
+  "name": "chuletarium-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npx serve public -l 3000 --no-clipboard"
+  },
   "dependencies": {
     "@ngx-translate/core": "^17.0.0",
-    "@ngx-translate/http-loader": "^17.0.0"
+    "@ngx-translate/http-loader": "^17.0.0",
+    "serve": "^14.2.4"
   }
 }
