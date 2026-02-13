@@ -1,0 +1,39 @@
+<section class="login-page">
+  <div class="login-card">
+    <div class="login-header">
+      <span class="login-logo">&lt;/&gt;</span>
+      <h1>Iniciar sesion</h1>
+      <p>Accede para guardar chuletas, marcarlas y gestionar tu perfil.</p>
+
+      <p class="login-alt">
+        No tienes cuenta?
+        <a routerLink="/register" [queryParams]="{ returnUrl: returnUrl }">Registrate</a>
+      </p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      <label>
+        Email
+        <input type="email" [(ngModel)]="email" name="email" required autocomplete="email" />
+      </label>
+
+      <label>
+        Contrasena
+        <div class="password-field">
+          <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required autocomplete="current-password" />
+          <button type="button" class="toggle-pass" (click)="showPassword = !showPassword">
+            {{ showPassword ? '&#x1F648;' : '&#x1F441;' }}
+          </button>
+        </div>
+      </label>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Cargando...' : 'Iniciar sesion' }}
+      </button>
+    </form>
+
+    <p class="terms">Al continuar, aceptas las condiciones de uso y privacidad.</p>
+  </div>
+</section>

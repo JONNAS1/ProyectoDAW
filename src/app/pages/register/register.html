@@ -1,0 +1,46 @@
+<section class="register-page">
+  <div class="register-card">
+    <div class="register-header">
+      <span class="register-logo">&lt;/&gt;</span>
+      <h1>Crear cuenta</h1>
+      <p>Registrate para guardar tus chuletas favoritas y acceder a tu perfil.</p>
+
+      <p class="register-alt">
+        Ya tienes cuenta?
+        <a routerLink="/login" [queryParams]="{ returnUrl: returnUrl }">Inicia sesion</a>
+      </p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="register-form">
+      <label>
+        Nombre de usuario
+        <input type="text" [(ngModel)]="username" name="username" required autocomplete="username" />
+      </label>
+
+      <label>
+        Email
+        <input type="email" [(ngModel)]="email" name="email" required autocomplete="email" />
+      </label>
+
+      <label>
+        Contrasena
+        <div class="password-field">
+          <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" required minlength="6" autocomplete="new-password" />
+          <button type="button" class="toggle-pass" (click)="showPassword = !showPassword">
+            {{ showPassword ? '&#x1F648;' : '&#x1F441;' }}
+          </button>
+        </div>
+      </label>
+
+      <p class="error" *ngIf="error">{{ error }}</p>
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Cargando...' : 'Registrarse' }}
+      </button>
+
+      <p class="hint">
+        La contrasena debe tener al menos 6 caracteres.
+      </p>
+    </form>
+  </div>
+</section>
