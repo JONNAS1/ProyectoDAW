@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chuletarium - Backend &amp; Database Schema</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface-hover: #22263a;
+      --border: #2a2e3f;
+      --text: #e4e4e7;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --primary-dim: #1e3a5f;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .container { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+    header {
+      text-align: center;
+      padding: 3rem 0 2rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+    header h1 span { color: var(--primary); }
+    header p { color: var(--text-muted); font-size: 1.05rem; }
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 600;
+      margin: 2.5rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin: 1.5rem 0 0.75rem;
+      color: var(--primary);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      vertical-align: middle;
+      margin-left: 0.4rem;
+    }
+    .badge-pk { background: var(--primary-dim); color: var(--primary); }
+    .badge-fk { background: #3b2a1a; color: var(--yellow); }
+    .badge-uq { background: #1a3a2a; color: var(--green); }
+    .badge-nn { background: #3a1a1a; color: var(--red); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+      background: var(--surface);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    thead th {
+      text-align: left;
+      padding: 0.6rem 1rem;
+      background: var(--surface-hover);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    tbody td {
+      padding: 0.55rem 1rem;
+      border-top: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tbody tr:hover { background: var(--surface-hover); }
+    td code, p code {
+      font-family: var(--font-mono);
+      font-size: 0.85em;
+      background: var(--surface-hover);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      color: var(--primary);
+    }
+    .relation-diagram {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      background: var(--surface);
+      padding: 1.25rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+      line-height: 1.5;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .endpoint-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .endpoint {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 1rem;
+      background: var(--surface);
+      border-radius: 6px;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+    }
+    .endpoint:hover { background: var(--surface-hover); }
+    .method {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      min-width: 3.5rem;
+      text-align: center;
+    }
+    .method-get { background: #1a3a2a; color: var(--green); }
+    .method-post { background: var(--primary-dim); color: var(--primary); }
+    .method-put { background: #3b2a1a; color: var(--yellow); }
+    .method-delete { background: #3a1a1a; color: var(--red); }
+    .endpoint-path {
+      font-family: var(--font-mono);
+      color: var(--text);
+    }
+    .endpoint-desc {
+      color: var(--text-muted);
+      margin-left: auto;
+      font-size: 0.82rem;
+    }
+    .note {
+      background: var(--primary-dim);
+      border: 1px solid #2a4a7a;
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      margin: 1rem 0;
+    }
+    .note strong { color: var(--primary); }
+    .file-tree {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: var(--surface);
+      padding: 1.25rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      line-height: 1.7;
+      white-space: pre;
+    }
+    .file-tree .comment { color: var(--text-muted); }
+    @media (max-width: 640px) {
+      .endpoint { flex-wrap: wrap; }
+      .endpoint-desc { margin-left: 0; width: 100%; padding-left: 4.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><span>Chuletarium</span> Backend</h1>
+      <p>Esquema de base de datos MySQL + API PHP para el proyecto Angular</p>
+    </header>
+
+    <div class="note">
+      <strong>Nota:</strong> Este proyecto Angular no se ejecuta en v0 (que usa Node.js/Next.js). Esta pagina documenta el backend PHP y la base de datos MySQL. Descarga el proyecto con el boton de 3 puntos &gt; "Download ZIP" para usar los archivos en tu servidor XAMPP/WAMP.
+    </div>
+
+    <h2>Estructura de Archivos</h2>
+    <div class="file-tree">backend/
+├── config/
+│   ├── database.php          <span class="comment">-- Conexion PDO a MySQL (chuletarium)</span>
+│   └── cors.php              <span class="comment">-- Cabeceras CORS para Angular</span>
+├── middleware/
+│   └── auth.php              <span class="comment">-- verificarAuth() + verificarAdmin()</span>
+├── api/
+│   ├── auth/
+│   │   ├── registro.php      <span class="comment">-- POST: Crear usuario (password_hash)</span>
+│   │   ├── login.php         <span class="comment">-- POST: Login (password_verify + cookie)</span>
+│   │   ├── logout.php        <span class="comment">-- POST: Cerrar sesion</span>
+│   │   └── perfil.php        <span class="comment">-- GET: Datos del usuario autenticado</span>
+│   ├── favoritos/
+│   │   ├── toggle.php        <span class="comment">-- POST: Anadir/quitar favorito</span>
+│   │   └── listar.php        <span class="comment">-- GET: Fichas favoritas del usuario</span>
+│   ├── fichas/
+│   │   ├── listar.php        <span class="comment">-- GET: Listar fichas (filtros)</span>
+│   │   └── detalle.php       <span class="comment">-- GET: Ficha completa con secciones</span>
+│   └── idioma/
+│       └── cambiar.php       <span class="comment">-- PUT: Cambiar idioma + cookie</span>
+└── database/
+    ├── schema.sql            <span class="comment">-- SQL para importar en phpMyAdmin</span>
+    └── insertar_admin.php    <span class="comment">-- Script para crear el primer admin</span></div>
+
+    <h2>API Endpoints</h2>
+    <div class="endpoint-grid">
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/api/auth/registro.php</span>
+        <span class="endpoint-desc">Crear usuario (password_hash)</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/api/auth/login.php</span>
+        <span class="endpoint-desc">Login (password_verify + cookie idioma)</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/api/auth/logout.php</span>
+        <span class="endpoint-desc">Cerrar sesion</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/api/auth/perfil.php</span>
+        <span class="endpoint-desc">Datos del usuario autenticado</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-post">POST</span>
+        <span class="endpoint-path">/api/favoritos/toggle.php</span>
+        <span class="endpoint-desc">Anadir/quitar favorito</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/api/favoritos/listar.php</span>
+        <span class="endpoint-desc">Fichas favoritas del usuario</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/api/fichas/listar.php</span>
+        <span class="endpoint-desc">Listar fichas con filtros</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-get">GET</span>
+        <span class="endpoint-path">/api/fichas/detalle.php</span>
+        <span class="endpoint-desc">Ficha completa con secciones y bloques</span>
+      </div>
+      <div class="endpoint">
+        <span class="method method-put">PUT</span>
+        <span class="endpoint-path">/api/idioma/cambiar.php</span>
+        <span class="endpoint-desc">Cambiar idioma + cookie</span>
+      </div>
+    </div>
+
+    <h2>Esquema de Base de Datos</h2>
+
+    <h3>usuarios</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID unico</td></tr>
+        <tr><td><code>username</code></td><td>VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Nombre de usuario</td></tr>
+        <tr><td><code>email</code></td><td>VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span> <span class="badge badge-uq">UNIQUE</span></td><td>Email (login)</td></tr>
+        <tr><td><code>password</code></td><td>VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Hash bcrypt (password_hash)</td></tr>
+        <tr><td><code>rol</code></td><td>TINYINT(1)</td><td><span class="badge badge-nn">NOT NULL</span> DEFAULT 0</td><td>0=normal, 1=admin</td></tr>
+        <tr><td><code>idioma</code></td><td>VARCHAR(5)</td><td>DEFAULT 'es'</td><td>es, en, fr...</td></tr>
+        <tr><td><code>fecha_creacion</code></td><td>DATETIME</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>Registro</td></tr>
+        <tr><td><code>activo</code></td><td>TINYINT(1)</td><td>DEFAULT 1</td><td>1=activo, 0=baneado</td></tr>
+      </tbody>
+    </table>
+
+    <h3>sesiones</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID</td></tr>
+        <tr><td><code>usuario_id</code></td><td>INT(11)</td><td><span class="badge badge-fk">FK</span> &rarr; usuarios(id)</td><td>Referencia al usuario</td></tr>
+        <tr><td><code>token</code></td><td>VARCHAR(255)</td><td><span class="badge badge-uq">UNIQUE</span></td><td>Token de sesion</td></tr>
+        <tr><td><code>fecha_creacion</code></td><td>DATETIME</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>Creacion</td></tr>
+        <tr><td><code>fecha_expiracion</code></td><td>DATETIME</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Expiracion</td></tr>
+      </tbody>
+    </table>
+
+    <h3>categorias</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID</td></tr>
+        <tr><td><code>nombre</code></td><td>VARCHAR(100)</td><td><span class="badge badge-uq">UNIQUE</span></td><td>Java, Python, SQL...</td></tr>
+        <tr><td><code>grupo</code></td><td>ENUM</td><td><span class="badge badge-nn">NOT NULL</span></td><td>programacion, bases_datos, terminal</td></tr>
+        <tr><td><code>descripcion</code></td><td>VARCHAR(255)</td><td>NULLABLE</td><td>Descripcion corta</td></tr>
+      </tbody>
+    </table>
+
+    <h3>fichas</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>VARCHAR(100)</td><td><span class="badge badge-pk">PK</span></td><td>Slug: java-basics</td></tr>
+        <tr><td><code>titulo</code></td><td>VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Titulo de la ficha</td></tr>
+        <tr><td><code>categoria_id</code></td><td>INT(11)</td><td><span class="badge badge-fk">FK</span> &rarr; categorias(id)</td><td>Categoria</td></tr>
+        <tr><td><code>descripcion</code></td><td>TEXT</td><td>NULLABLE</td><td>Descripcion larga</td></tr>
+        <tr><td><code>nivel</code></td><td>ENUM</td><td>DEFAULT 'Basico'</td><td>Basico, Intermedio, Avanzado</td></tr>
+        <tr><td><code>fecha_actualizacion</code></td><td>DATE</td><td>NULLABLE</td><td>Ultima actualizacion</td></tr>
+        <tr><td><code>fecha_creacion</code></td><td>DATETIME</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>Creacion</td></tr>
+      </tbody>
+    </table>
+
+    <h3>secciones</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID</td></tr>
+        <tr><td><code>ficha_id</code></td><td>VARCHAR(100)</td><td><span class="badge badge-fk">FK</span> &rarr; fichas(id)</td><td>Ficha padre</td></tr>
+        <tr><td><code>slug</code></td><td>VARCHAR(100)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Anchor: strings, loops...</td></tr>
+        <tr><td><code>titulo</code></td><td>VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Titulo de la seccion</td></tr>
+        <tr><td><code>orden</code></td><td>INT(11)</td><td>DEFAULT 0</td><td>Orden de aparicion</td></tr>
+      </tbody>
+    </table>
+
+    <h3>bloques</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID</td></tr>
+        <tr><td><code>seccion_id</code></td><td>INT(11)</td><td><span class="badge badge-fk">FK</span> &rarr; secciones(id)</td><td>Seccion padre</td></tr>
+        <tr><td><code>titulo</code></td><td>VARCHAR(255)</td><td>NULLABLE</td><td>Titulo del bloque</td></tr>
+        <tr><td><code>texto</code></td><td>TEXT</td><td>NULLABLE</td><td>Texto explicativo</td></tr>
+        <tr><td><code>codigo</code></td><td>TEXT</td><td>NULLABLE</td><td>Codigo de ejemplo</td></tr>
+        <tr><td><code>orden</code></td><td>INT(11)</td><td>DEFAULT 0</td><td>Orden de aparicion</td></tr>
+      </tbody>
+    </table>
+
+    <h3>bloques_notas</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID</td></tr>
+        <tr><td><code>bloque_id</code></td><td>INT(11)</td><td><span class="badge badge-fk">FK</span> &rarr; bloques(id)</td><td>Bloque padre</td></tr>
+        <tr><td><code>nota</code></td><td>TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Contenido de la nota</td></tr>
+        <tr><td><code>orden</code></td><td>INT(11)</td><td>DEFAULT 0</td><td>Orden</td></tr>
+      </tbody>
+    </table>
+
+    <h3>fichas_tags</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID</td></tr>
+        <tr><td><code>ficha_id</code></td><td>VARCHAR(100)</td><td><span class="badge badge-fk">FK</span> &rarr; fichas(id)</td><td>Ficha asociada</td></tr>
+        <tr><td><code>tag</code></td><td>VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Tag: basico, oop, web...</td></tr>
+      </tbody>
+    </table>
+
+    <h3>favoritos</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID</td></tr>
+        <tr><td><code>usuario_id</code></td><td>INT(11)</td><td><span class="badge badge-fk">FK</span> &rarr; usuarios(id)</td><td>Usuario</td></tr>
+        <tr><td><code>ficha_id</code></td><td>VARCHAR(100)</td><td><span class="badge badge-fk">FK</span> &rarr; fichas(id)</td><td>Ficha favorita</td></tr>
+        <tr><td><code>fecha_creacion</code></td><td>DATETIME</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>Cuando se anadio</td></tr>
+      </tbody>
+    </table>
+
+    <h3>snippets</h3>
+    <table>
+      <thead><tr><th>Columna</th><th>Tipo</th><th>Atributos</th><th>Descripcion</th></tr></thead>
+      <tbody>
+        <tr><td><code>id</code></td><td>INT(11)</td><td><span class="badge badge-pk">PK</span> AUTO_INCREMENT</td><td>ID</td></tr>
+        <tr><td><code>badge</code></td><td>VARCHAR(50)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Python, SQL, JS...</td></tr>
+        <tr><td><code>titulo</code></td><td>VARCHAR(255)</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Titulo del snippet</td></tr>
+        <tr><td><code>codigo</code></td><td>TEXT</td><td><span class="badge badge-nn">NOT NULL</span></td><td>Codigo del snippet</td></tr>
+        <tr><td><code>descripcion</code></td><td>TEXT</td><td>NULLABLE</td><td>Descripcion opcional</td></tr>
+        <tr><td><code>usuario_id</code></td><td>INT(11)</td><td><span class="badge badge-fk">FK</span> &rarr; usuarios(id) NULLABLE</td><td>NULL = del sistema</td></tr>
+        <tr><td><code>fecha_creacion</code></td><td>DATETIME</td><td>DEFAULT CURRENT_TIMESTAMP</td><td>Creacion</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Relaciones</h2>
+    <div class="relation-diagram">
+usuarios (1) ----&lt; (N) sesiones          FK: usuario_id ON DELETE CASCADE
+usuarios (1) ----&lt; (N) favoritos         FK: usuario_id ON DELETE CASCADE
+usuarios (1) ----&lt; (N) snippets          FK: usuario_id ON DELETE SET NULL
+
+categorias (1) --&lt; (N) fichas            FK: categoria_id ON DELETE CASCADE
+
+fichas (1) ------&lt; (N) secciones         FK: ficha_id ON DELETE CASCADE
+fichas (1) ------&lt; (N) fichas_tags       FK: ficha_id ON DELETE CASCADE
+fichas (1) ------&lt; (N) favoritos         FK: ficha_id ON DELETE CASCADE
+
+secciones (1) ---&lt; (N) bloques           FK: seccion_id ON DELETE CASCADE
+
+bloques (1) -----&lt; (N) bloques_notas     FK: bloque_id ON DELETE CASCADE</div>
+
+    <h2>Seguridad</h2>
+    <table>
+      <thead><tr><th>Caracteristica</th><th>Implementacion</th></tr></thead>
+      <tbody>
+        <tr><td>Hashing de passwords</td><td><code>password_hash($password, PASSWORD_DEFAULT)</code> (bcrypt)</td></tr>
+        <tr><td>Verificacion de passwords</td><td><code>password_verify($password, $hash)</code></td></tr>
+        <tr><td>Prevencion SQL Injection</td><td>Consultas parametrizadas PDO (<code>:email</code>, <code>:password</code>...)</td></tr>
+        <tr><td>Sesiones</td><td>Token aleatorio (<code>bin2hex(random_bytes(64))</code>) con expiracion</td></tr>
+        <tr><td>Cookie de idioma</td><td><code>setcookie('idioma', $lang, ...)</code> HttpOnly, SameSite=Lax</td></tr>
+        <tr><td>Roles</td><td><code>rol=0</code> (normal), <code>rol=1</code> (admin) con middleware</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Pasos de Instalacion</h2>
+    <div class="note">
+      <strong>1.</strong> Importa <code>backend/database/schema.sql</code> en phpMyAdmin<br>
+      <strong>2.</strong> Configura <code>backend/config/database.php</code> con tus credenciales<br>
+      <strong>3.</strong> Ejecuta <code>php backend/database/insertar_admin.php</code> para crear el admin<br>
+      <strong>4.</strong> Copia la carpeta <code>backend/</code> en tu servidor Apache (XAMPP/WAMP)<br>
+      <strong>5.</strong> Configura Angular para apuntar a <code>http://localhost/backend/api/</code>
+    </div>
+  </div>
+</body>
+</html>
